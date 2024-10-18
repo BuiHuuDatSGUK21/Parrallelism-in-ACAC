@@ -58,6 +58,9 @@ public class AlgoACAC extends ClassificationAlgorithm implements Serializable {
 	/** minimum confidence */
 	double minConf;
 
+	/** SparkContext */
+	private JavaSparkContext sparkContext;
+
 
 	/**
 	 * Main constructor
@@ -66,10 +69,11 @@ public class AlgoACAC extends ClassificationAlgorithm implements Serializable {
 	 * @param minConf    minimum confidence
 	 * @param minAllConf minimum all-confidence
 	 */
-	public AlgoACAC(double minSup, double minConf, double minAllConf) {
+	public AlgoACAC(JavaSparkContext sparkContext,double minSup, double minConf, double minAllConf) {
 		this.minSup = minSup;
 		this.minConf = minConf;
 		this.minAllConf = minAllConf;
+		this.sparkContext = sparkContext;
 	}
 
 	/**
@@ -81,7 +85,7 @@ public class AlgoACAC extends ClassificationAlgorithm implements Serializable {
 	@Override
 	public Classifier train(Dataset dataset) {
 		AprioriForACAC apriori = new AprioriForACAC();
-		List<RuleACAC> rules = apriori.run(dataset, minSup, minConf, minAllConf);
+		List<RuleACAC> rules = apriori.run(sparkContext, dataset, minSup, minConf, minAllConf);
 		return new ClassifierACAC(rules);
 	}
 

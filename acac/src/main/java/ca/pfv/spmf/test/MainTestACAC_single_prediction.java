@@ -18,10 +18,12 @@ package ca.pfv.spmf.test;
 */
 
 import ca.pfv.spmf.algorithms.classifiers.acac.AlgoACAC;
+import ca.pfv.spmf.algorithms.classifiers.acac.SparkManager;
 import ca.pfv.spmf.algorithms.classifiers.data.Instance;
 import ca.pfv.spmf.algorithms.classifiers.data.StringDataset;
 import ca.pfv.spmf.algorithms.classifiers.general.Classifier;
 import ca.pfv.spmf.algorithms.classifiers.general.RuleClassifier;
+import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -35,7 +37,8 @@ public class MainTestACAC_single_prediction {
 
 	
 	public static void main(String[] args) throws Exception {
-		
+		JavaSparkContext sc = SparkManager.build();
+
 		//********************************************************
 		//**************** READ A DATASET IN MEMORY ************
 		//********************************************************
@@ -76,7 +79,7 @@ public class MainTestACAC_single_prediction {
 		double minAllConf = 0.5;
 		
 		// Train the model on the training data and make predictions  on the testing data
-		Classifier classifier = new AlgoACAC(minSup, minConf, minAllConf).trainAndCalculateStats(dataset);
+		Classifier classifier = new AlgoACAC(sc, minSup, minConf, minAllConf).trainAndCalculateStats(dataset);
 		
 		//****************************************
 		//**************** OPTIONAL **************

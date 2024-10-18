@@ -12,7 +12,7 @@ public class SparkManager {
             // Tạo SparkConf với các tham số cấu hình
             SparkConf conf = new SparkConf()
                     .setAppName("SparkApp")
-                    .setMaster("local[6]");
+                    .setMaster("local[1]");
 
             sparkContext = new JavaSparkContext(conf);
         }

@@ -64,8 +64,8 @@ import java.util.function.Function;
  */
 public class AprioriForACAC {
     private JavaRDD<Instance> cachedPartitionRDD;
-	private JavaSparkContext sparkContext;
-	private final int partition = 6;
+//	private JavaSparkContext sparkContext;
+	private final int partition = 1;
 	public AprioriForACAC() {
 
 	}
@@ -78,8 +78,8 @@ public class AprioriForACAC {
 	 * @return rules whose support and confidence is greater than a user-specified
 	 *         threshold
 	 */
-	public List<RuleACAC> run(Dataset dataset, double minSup, double minConf, double minAllConf) {
-		sparkContext = SparkManager.build();
+	public List<RuleACAC> run(JavaSparkContext sparkContext, Dataset dataset, double minSup, double minConf, double minAllConf) {
+//		sparkContext = SparkManager.build();
 
 		// Calculate support relative to the current dataset
 		long minSupRelative = (long) Math.ceil(minSup * dataset.getInstances().size());
@@ -113,10 +113,10 @@ public class AprioriForACAC {
 		do {
 			// if we are going to generate candidates of size 2
 			if (k == 2) {
-				level = generateAndTestCandidateSize2(dataset, minConf, minAllConf, minSupRelative, rules, frequent1);
+				level = generateAndTestCandidateSize2(sparkContext ,dataset, minConf, minAllConf, minSupRelative, rules, frequent1);
 			} else {
 				// If we are going to generate candidate of a size k > 2
-				level = generateAndTestCandidateSizeK(dataset, minConf, minAllConf, minSupRelative, rules, level);
+				level = generateAndTestCandidateSizeK(sparkContext, dataset, minConf, minAllConf, minSupRelative, rules, level);
 			}
 			// Next we will search for candidates of size k+1 if the set of patterns is not
 			// empty
@@ -144,7 +144,7 @@ public class AprioriForACAC {
 	 * @param level         the rules of size k -1
 	 * @return The list of rules of size k that are valid (according to ACAC)
 	 */
-	private List<RuleACAC> generateAndTestCandidateSizeK(Dataset dataset, double minConf, double minAllConf,
+	private List<RuleACAC> generateAndTestCandidateSizeK(JavaSparkContext sparkContext,Dataset dataset, double minConf, double minAllConf,
 														 long minSupRelative, List<RuleACAC> rules, List<RuleACAC> level) {
 		// Store the rules of size k-1 in a variable
 		List<RuleACAC> previousLevel = level;
@@ -207,7 +207,7 @@ public class AprioriForACAC {
 	 * @param frequent1      The Frequent items.
 	 * @return The list of rules of size 2 that are valid (according to ACAC)
 	 */
-	private List<RuleACAC> generateAndTestCandidateSize2(Dataset dataset, double minConf, double minAllConf,
+	private List<RuleACAC> generateAndTestCandidateSize2(JavaSparkContext sparkContext ,Dataset dataset, double minConf, double minAllConf,
 			long minSupRelative, List<RuleACAC> rules, List<Item> frequent1) {
 		// Create a list to store the rules
 		List<RuleACAC> level = new ArrayList<RuleACAC>();

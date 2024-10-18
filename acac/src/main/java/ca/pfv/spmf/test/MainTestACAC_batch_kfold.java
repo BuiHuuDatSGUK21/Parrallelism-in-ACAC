@@ -18,10 +18,12 @@ package ca.pfv.spmf.test;
 */
 
 import ca.pfv.spmf.algorithms.classifiers.acac.AlgoACAC;
+import ca.pfv.spmf.algorithms.classifiers.acac.SparkManager;
 import ca.pfv.spmf.algorithms.classifiers.data.StringDataset;
 import ca.pfv.spmf.algorithms.classifiers.general.ClassificationAlgorithm;
 import ca.pfv.spmf.algorithms.classifiers.general.Evaluator;
 import ca.pfv.spmf.algorithms.classifiers.general.OverallResults;
+import org.apache.spark.api.java.JavaSparkContext;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -35,7 +37,7 @@ public class MainTestACAC_batch_kfold {
 
 	
 	public static void main(String[] args) throws Exception {
-		
+		JavaSparkContext sc = SparkManager.build();
 		System.out.println("========= Step 1: Read the dataset ==========");
 		
 		// We choose "play" as the target attribute that we want to predict using other attributes
@@ -67,7 +69,7 @@ public class MainTestACAC_batch_kfold {
 		double minAllConf = 0.5;
 
 		// Create the algorithm
-		ClassificationAlgorithm algorithmACAC = new AlgoACAC(minSup, minConf, minAllConf);
+		ClassificationAlgorithm algorithmACAC = new AlgoACAC(sc, minSup, minConf, minAllConf);
 		ClassificationAlgorithm[] algorithms = new ClassificationAlgorithm[] {algorithmACAC};
 
 		// We create an object Evaluator to run the experiment using k-fold cross validation
