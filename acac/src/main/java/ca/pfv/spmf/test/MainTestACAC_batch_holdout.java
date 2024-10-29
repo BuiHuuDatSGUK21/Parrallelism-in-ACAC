@@ -55,10 +55,11 @@ public class MainTestACAC_batch_holdout {
 			long startTime = System.currentTimeMillis();
 			// We choose "play" as the target attribute that we want to predict using other attributes
 //			String targetClassName = "spam";
-			String targetClassName = "class";
+			String targetClassName = "spam";
 			//DRK_YN
+			//D:\Parrallelism-in-ACAC\acac\src\main\java\ca\pfv\spmf\test\MushroomDataSet
 			// Load the dataset
-			String datasetPath = fileToPath("D:\\Github\\Parrallelism-in-ACAC\\acac\\src\\main\\java\\ca\\pfv\\spmf\\test\\mushroomDataSet");
+			String datasetPath = fileToPath("D:\\Parrallelism-in-ACAC\\acac\\src\\main\\java\\ca\\pfv\\spmf\\test\\zSpamMail");
 			StringDataset dataset = new StringDataset(datasetPath, targetClassName);
 	//
 			//  If the dataset is in ARFF format, then use these lines instead:

@@ -207,6 +207,44 @@ public class AprioriForACAC {
 	 * @param frequent1      The Frequent items.
 	 * @return The list of rules of size 2 that are valid (according to ACAC)
 	 */
+	private List<RuleACAC> generateAndTestCandidateSize2_test(JavaSparkContext sparkContext, Dataset dataset, double minConf, double minAllConf,
+                                                                                                 long minSupRelative, List<ca.pfv.spmf.algorithms.classifiers.acac.RuleACAC> rules, List<Item> frequent1) {
+		long start = System.currentTimeMillis();
+		// Create a list to store the rules
+		List<RuleACAC> level = new ArrayList<RuleACAC>();
+		List<RuleACAC> localRules = new ArrayList<>();
+		final Broadcast<Dataset> bcDataset = sparkContext.broadcast(dataset);
+		// For each frequent item I1
+		for (Item item1 : frequent1) {
+			// It will be the rule antecedent
+			short[] antecedent = new short[] { item1.item };
+
+			// For each item I2 that is a class value
+			for (int j = 0; j < dataset.getClassesCount(); j++) {
+				// Get the class value and its support
+				short klass = dataset.getKlassAt(j);
+				long supportKlass = dataset.getMapClassToFrequency().getOrDefault(klass, 0L);
+
+				// Create the rule
+				RuleACAC rule = new RuleACAC(antecedent);
+				rule.setKlass(klass);
+				rule.setMaximums(item1.support, supportKlass);
+
+				localRules.add(rule);
+				}
+		}
+		//List<RuleACAC> allRules = createRule.collect();
+		JavaRDD<RuleACAC> rulesRDD = sparkContext.parallelize(localRules, partition);
+
+		JavaRDD<Tuple2<List<RuleACAC>, List<RuleACAC>>>  resultsRDD = evaluateRules(rulesRDD,  bcDataset, minConf, minAllConf, minSupRelative);
+		List<Tuple2<List<RuleACAC>, List<RuleACAC>>> collectedResults = resultsRDD.collect();
+		for (Tuple2<List<RuleACAC>, List<RuleACAC>> tuple : collectedResults) {
+    		rules.addAll(tuple._1());
+    		level.addAll(tuple._2());
+		}
+
+		return level;
+	}
 	private List<RuleACAC> generateAndTestCandidateSize2(JavaSparkContext sparkContext ,Dataset dataset, double minConf, double minAllConf,
 			long minSupRelative, List<RuleACAC> rules, List<Item> frequent1) {
 		// Create a list to store the rules
